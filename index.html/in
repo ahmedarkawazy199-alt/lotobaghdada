@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🎰 اللوتري</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --red: #E8000D;
+    --red-dark: #9B0009;
+    --red-glow: #FF1A25;
+    --black: #0A0A0A;
+    --black2: #111111;
+    --black3: #1A1A1A;
+    --gold: #FFD700;
+    --white: #F5F5F5;
+    --gray: #888;
+  }
+
+  body {
+    background: var(--black);
+    font-family: 'Cairo', sans-serif;
+    color: var(--white);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* خلفية شبكة */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(232,0,13,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(232,0,13,0.04) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container {
+    max-width: 420px;
+    margin: 0 auto;
+    padding: 20px 16px 100px;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Header */
+  .header {
+    text-align: center;
+    padding: 24px 0 20px;
+  }
+
+  .logo {
+    font-size: 42px;
+    margin-bottom: 4px;
+    filter: drop-shadow(0 0 20px rgba(232,0,13,0.8));
+    animation: pulse 2s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { filter: drop-shadow(0 0 20px rgba(232,0,13,0.8)); }
+    50% { filter: drop-shadow(0 0 35px rgba(255,26,37,1)); }
+  }
+
+  .title {
+    font-size: 28px;
+    font-weight: 900;
+    background: linear-gradient(135deg, #FF1A25, #FFD700);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    letter-spacing: 2px;
+  }
+
+  .subtitle {
+    font-size: 12px;
+    color: var(--gray);
+    margin-top: 4px;
+    letter-spacing: 1px;
+  }
+
+  /* بطاقة الرصيد */
+  .balance-card {
+    background: linear-gradient(135deg, var(--red-dark) 0%, #1a0002 100%);
+    border: 1px solid var(--red);
+    border-radius: 16px;
+    padding: 20px;
+    margin: 16px 0;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .balance-card::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(232,0,13,0.1) 0%, transparent 60%);
+    animation: rotate 8s linear infinite;
+  }
+
+  @keyframes rotate {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+
+  .balance-label {
+    font-size: 12px;
+    color: rgba(255,255,255,0.6);
+    margin-bottom: 6px;
+    position: relative;
+  }
+
+  .balance-amount {
+    font-size: 38px;
+    font-weight: 900;
+    color: var(--gold);
+    position: relative;
+    text-shadow: 0 0 20px rgba(255,215,0,0.4);
+  }
+
+  .balance-amount span {
+    font-size: 16px;
+    color: rgba(255,215,0,0.7);
+    font-weight: 600;
+    margin-right: 4px;
+  }
+
+  .balance-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+  }
+
+  .tickets-owned {
+    text-align: left;
+    position: relative;
+  }
+
+  .tickets-owned .num {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--red-glow);
+  }
+
+  .tickets-owned .lbl {
+    font-size: 11px;
+    color: rgba(255,255,255,0.5);
+  }
+
+  /* حالة الجولة */
+  .round-card {
+    background: var(--black3);
+    border: 1px solid #2a2a2a;
+    border-radius: 16px;
+    padding: 16px;
+    margin: 12px 0;
+  }
+
+  .round-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+  }
+
+  .round-title {
+    font-size: 13px;
+    color: var(--gray);
+    font-weight: 600;
+  }
+
+  .round-num {
+    font-size: 13px;
+    color: var(--red);
+    font-weight: 700;
+    background: rgba(232,0,13,0.1);
+    padding: 3px 10px;
+    border-radius: 20px;
+    border: 1px solid rgba(232,0,13,0.3);
+  }
+
+  /* شريط التقدم */
+  .progress-wrap {
+    margin: 8px 0;
+  }
+
+  .progress-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    color: var(--gray);
+    margin-bottom: 6px;
+  }
+
+  .progress-bar {
+    background: #222;
+    border-radius: 99px;
+    height: 10px;
+    overflow: hidden;
+    border: 1px solid #333;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--red-dark), var(--red-glow));
+    border-radius: 99px;
+    transition: width 0.6s ease;
+    box-shadow: 0 0 10px rgba(232,0,13,0.5);
+    width: 37.5%; /* 75/200 */
+  }
+
+  .progress-stats {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
+    gap: 8px;
+  }
+
+  .stat-box {
+    flex: 1;
+    background: #151515;
+    border-radius: 10px;
+    padding: 10px;
+    text-align: center;
+    border: 1px solid #222;
+  }
+
+  .stat-val {
+    font-size: 18px;
+    font-weight: 800;
+    color: var(--white);
+  }
+
+  .stat-val.gold { color: var(--gold); }
+  .stat-val.red { color: var(--red-glow); }
+
+  .stat-lbl {
+    font-size: 10px;
+    color: var(--gray);
+    margin-top: 2px;
+  }
+
+  /* قسم شراء التذكرة */
+  .buy-section {
+    background: var(--black3);
+    border: 1px solid #2a2a2a;
+    border-radius: 16px;
+    padding: 18px;
+    margin: 12px 0;
+  }
+
+  .section-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--white);
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  /* شبكة الأرقام */
+  .numbers-grid {
+    display: grid;
+    grid-template-columns: repeat(9, 1fr);
+    gap: 6px;
+    margin-bottom: 14px;
+  }
+
+  .num-box {
+    aspect-ratio: 1;
+    background: #222;
+    border: 1px solid #333;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.15s;
+    color: var(--white);
+  }
+
+  .num-box:hover {
+    background: rgba(232,0,13,0.2);
+    border-color: var(--red);
+    color: var(--red-glow);
+    transform: scale(1.05);
+  }
+
+  .num-box.selected {
+    background: var(--red);
+    border-color: var(--red-glow);
+    color: white;
+    box-shadow: 0 0 10px rgba(232,0,13,0.5);
+    transform: scale(1.05);
+  }
+
+  /* حقل عرض الأرقام المختارة */
+  .ticket-display {
+    background: #0d0d0d;
+    border: 1px solid #333;
+    border-radius: 10px;
+    padding: 12px 14px;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    min-height: 50px;
+    flex-wrap: wrap;
+  }
+
+  .ticket-display .placeholder {
+    color: #444;
+    font-size: 12px;
+  }
+
+  .chosen-num {
+    background: var(--red);
+    color: white;
+    font-size: 13px;
+    font-weight: 700;
+    padding: 4px 8px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: opacity 0.15s;
+  }
+
+  .chosen-num:hover { opacity: 0.7; }
+
+  .progress-text {
+    font-size: 11px;
+    color: var(--gray);
+    margin-bottom: 12px;
+    text-align: center;
+  }
+
+  .progress-text strong {
+    color: var(--red-glow);
+  }
+
+  /* الأزرار */
+  .btn-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+
+  .btn {
+    padding: 12px;
+    border-radius: 10px;
+    border: none;
+    font-family: 'Cairo', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+  }
+
+  .btn-auto {
+    background: #1a1a1a;
+    color: var(--white);
+    border: 1px solid #333;
+  }
+
+  .btn-auto:hover {
+    background: #222;
+    border-color: var(--red);
+    color: var(--red-glow);
+  }
+
+  .btn-clear {
+    background: #1a1a1a;
+    color: var(--gray);
+    border: 1px solid #2a2a2a;
+  }
+
+  .btn-clear:hover { background: #222; }
+
+  .btn-buy {
+    width: 100%;
+    padding: 15px;
+    background: linear-gradient(135deg, var(--red-dark), var(--red));
+    color: white;
+    font-size: 16px;
+    border-radius: 12px;
+    border: none;
+    font-family: 'Cairo', sans-serif;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 4px 20px rgba(232,0,13,0.3);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .btn-buy:hover {
+    box-shadow: 0 4px 30px rgba(232,0,13,0.6);
+    transform: translateY(-1px);
+  }
+
+  .btn-buy:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  .btn-buy::before {
+    content: '';
+    position: absolute;
+    top: 0; left: -100%;
+    width: 100%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+    transition: left 0.4s;
+  }
+
+  .btn-buy:hover::before { left: 100%; }
+
+  /* السعر */
+  .price-tag {
+    text-align: center;
+    font-size: 11px;
+    color: var(--gray);
+    margin-top: 8px;
+  }
+
+  .price-tag strong { color: var(--gold); }
+
+  /* آخر الفائزين */
+  .winners-card {
+    background: var(--black3);
+    border: 1px solid #2a2a2a;
+    border-radius: 16px;
+    padding: 16px;
+    margin: 12px 0;
+  }
+
+  .winner-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid #1e1e1e;
+  }
+
+  .winner-item:last-child { border-bottom: none; }
+
+  .winner-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .winner-avatar {
+    width: 36px;
+    height: 36px;
+    background: linear-gradient(135deg, var(--red-dark), #3a0000);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    border: 1px solid rgba(232,0,13,0.3);
+  }
+
+  .winner-name {
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  .winner-round {
+    font-size: 11px;
+    color: var(--gray);
+  }
+
+  .winner-prize {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--gold);
+  }
+
+  /* Toast إشعار */
+  .toast {
+    position: fixed;
+    bottom: 100px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: var(--black3);
+    border: 1px solid var(--red);
+    color: white;
+    padding: 12px 20px;
+    border-radius: 12px;
+    font-size: 13px;
+    font-family: 'Cairo', sans-serif;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+    z-index: 100;
+    opacity: 0;
+    transition: all 0.3s;
+    white-space: nowrap;
+  }
+
+  .toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+
+  /* Bottom nav */
+  .bottom-nav {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    background: var(--black2);
+    border-top: 1px solid #1e1e1e;
+    display: flex;
+    padding: 10px 0 20px;
+    z-index: 50;
+  }
+
+  .nav-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    cursor: pointer;
+    padding: 4px;
+    transition: all 0.2s;
+  }
+
+  .nav-icon { font-size: 22px; }
+
+  .nav-label {
+    font-size: 10px;
+    color: var(--gray);
+    font-family: 'Cairo', sans-serif;
+    transition: color 0.2s;
+  }
+
+  .nav-item.active .nav-label { color: var(--red-glow); }
+  .nav-item.active .nav-icon { filter: drop-shadow(0 0 6px rgba(232,0,13,0.7)); }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <!-- Header -->
+  <div class="header">
+    <div class="logo">🎰</div>
+    <div class="title">LOTTO</div>
+    <div class="subtitle">العب واربح الجائزة الكبرى</div>
+  </div>
+
+  <!-- بطاقة الرصيد -->
+  <div class="balance-card">
+    <div class="balance-label">💼 رصيدك</div>
+    <div class="balance-row">
+      <div>
+        <div class="balance-amount"><span id="balance">50,000</span><span style="font-size:14px;margin-right:6px">د.ع</span></div>
+      </div>
+      <div class="tickets-owned">
+        <div class="num" id="myTickets">3</div>
+        <div class="lbl">تذاكرك</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- حالة الجولة -->
+  <div class="round-card">
+    <div class="round-header">
+      <div class="round-title">📊 الجولة الحالية</div>
+      <div class="round-num">#14</div>
+    </div>
+    <div class="progress-wrap">
+      <div class="progress-labels">
+        <span>التذاكر المباعة</span>
+        <span id="soldCount">75 / 200</span>
+      </div>
+      <div class="progress-bar">
+        <div class="progress-fill" id="progressFill"></div>
+      </div>
+    </div>
+    <div class="progress-stats">
+      <div class="stat-box">
+        <div class="stat-val gold" id="prizePool" style="font-size:13px">262,500</div>
+        <div class="stat-lbl">الجائزة (د.ع)</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-val red" id="remaining">125</div>
+        <div class="stat-lbl">تذكرة متبقية</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-val" style="font-size:13px">5,000</div>
+        <div class="stat-lbl">سعر التذكرة (د.ع)</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- شراء التذكرة -->
+  <div class="buy-section">
+    <div class="section-title">🎟️ اختار أرقامك (9 أرقام)</div>
+
+    <!-- عرض الأرقام المختارة -->
+    <div class="ticket-display" id="ticketDisplay">
+      <span class="placeholder">اختار 9 أرقام من القائمة أدناه...</span>
+    </div>
+
+    <div class="progress-text">تم اختيار <strong id="selectedCount">0</strong> من 9 أرقام</div>
+
+    <!-- شبكة الأرقام 1-45 -->
+    <div class="numbers-grid" id="numbersGrid"></div>
+
+    <!-- أزرار -->
+    <div class="btn-row">
+      <button class="btn btn-auto" onclick="autoSelect()">🎲 اختيار تلقائي</button>
+      <button class="btn btn-clear" onclick="clearAll()">🗑️ مسح الكل</button>
+    </div>
+
+    <button class="btn-buy" id="buyBtn" onclick="buyTicket()" disabled>
+      🎟️ شراء التذكرة — 5,000 د.ع
+    </button>
+    <div class="price-tag">الجائزة الحالية: <strong id="currentPrize">262,500 د.ع</strong></div>
+  </div>
+
+  <!-- آخر الفائزين -->
+  <div class="winners-card">
+    <div class="section-title">🏆 آخر الفائزين</div>
+
+    <div class="winner-item">
+      <div class="winner-left">
+        <div class="winner-avatar">👑</div>
+        <div>
+          <div class="winner-name">@ahmed_iraq</div>
+          <div class="winner-round">جولة #13</div>
+        </div>
+      </div>
+      <div class="winner-prize">700,000 د.ع</div>
+    </div>
+
+    <div class="winner-item">
+      <div class="winner-left">
+        <div class="winner-avatar">🎯</div>
+        <div>
+          <div class="winner-name">@hassan99</div>
+          <div class="winner-round">جولة #12</div>
+        </div>
+      </div>
+      <div class="winner-prize">700,000 د.ع</div>
+    </div>
+
+    <div class="winner-item">
+      <div class="winner-left">
+        <div class="winner-avatar">🔥</div>
+        <div>
+          <div class="winner-name">@m_ali2024</div>
+          <div class="winner-round">جولة #11</div>
+        </div>
+      </div>
+      <div class="winner-prize">700,000 د.ع</div>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<!-- Bottom Nav -->
+<div class="bottom-nav">
+  <div class="nav-item active">
+    <div class="nav-icon">🎰</div>
+    <div class="nav-label">اللوتري</div>
+  </div>
+  <div class="nav-item">
+    <div class="nav-icon">🎟️</div>
+    <div class="nav-label">تذاكري</div>
+  </div>
+  <div class="nav-item">
+    <div class="nav-icon">🏆</div>
+    <div class="nav-label">الفائزين</div>
+  </div>
+  <div class="nav-item">
+    <div class="nav-icon">👤</div>
+    <div class="nav-label">حسابي</div>
+  </div>
+</div>
+
+<script>
+  const TOTAL = 9;
+  const NUMS_COUNT = 45;
+  let selected = [];
+
+  // بناء شبكة الأرقام
+  function buildGrid() {
+    const grid = document.getElementById('numbersGrid');
+    for (let i = 1; i <= NUMS_COUNT; i++) {
+      const box = document.createElement('div');
+      box.className = 'num-box';
+      box.textContent = i;
+      box.dataset.num = i;
+      box.onclick = () => toggleNum(i, box);
+      grid.appendChild(box);
+    }
+  }
+
+  function toggleNum(n, el) {
+    if (selected.includes(n)) {
+      selected = selected.filter(x => x !== n);
+      el.classList.remove('selected');
+    } else {
+      if (selected.length >= TOTAL) {
+        showToast('⚠️ اختيار 9 أرقام فقط!');
+        return;
+      }
+      selected.push(n);
+      el.classList.add('selected');
+    }
+    updateDisplay();
+  }
+
+  function updateDisplay() {
+    const display = document.getElementById('ticketDisplay');
+    const count = document.getElementById('selectedCount');
+    const btn = document.getElementById('buyBtn');
+
+    count.textContent = selected.length;
+
+    if (selected.length === 0) {
+      display.innerHTML = '<span class="placeholder">اختار 9 أرقام من القائمة أدناه...</span>';
+    } else {
+      display.innerHTML = selected.sort((a,b)=>a-b).map(n =>
+        `<span class="chosen-num" onclick="removeNum(${n})">${n} ✕</span>`
+      ).join('');
+    }
+
+    btn.disabled = selected.length !== TOTAL;
+  }
+
+  function removeNum(n) {
+    selected = selected.filter(x => x !== n);
+    document.querySelector(`[data-num="${n}"]`).classList.remove('selected');
+    updateDisplay();
+  }
+
+  function autoSelect() {
+    clearAll();
+    const nums = [];
+    while (nums.length < TOTAL) {
+      const r = Math.floor(Math.random() * NUMS_COUNT) + 1;
+      if (!nums.includes(r)) nums.push(r);
+    }
+    nums.forEach(n => {
+      selected.push(n);
+      document.querySelector(`[data-num="${n}"]`).classList.add('selected');
+    });
+    updateDisplay();
+    showToast('🎲 تم اختيار أرقامك تلقائياً!');
+  }
+
+  function clearAll() {
+    selected = [];
+    document.querySelectorAll('.num-box').forEach(b => b.classList.remove('selected'));
+    updateDisplay();
+  }
+
+  function buyTicket() {
+    if (selected.length !== TOTAL) return;
+    const ticket = selected.sort((a,b)=>a-b).join(' - ');
+    showToast(`✅ تذكرتك: ${ticket}`);
+
+    // تحديث الرصيد (محاكاة)
+    const bal = parseInt(document.getElementById('balance').textContent.replace(/,/g, ''));
+    document.getElementById('balance').textContent = (bal - 5000).toLocaleString();
+
+    const myT = parseInt(document.getElementById('myTickets').textContent);
+    document.getElementById('myTickets').textContent = myT + 1;
+
+    // تحديث التقدم
+    const sold = parseInt(document.getElementById('soldCount').textContent.split('/')[0].trim()) + 1;
+    const remaining = 200 - sold;
+    document.getElementById('soldCount').textContent = `${sold} / 200`;
+    document.getElementById('remaining').textContent = remaining;
+    document.getElementById('progressFill').style.width = `${(sold/200)*100}%`;
+    const prize = Math.round(sold * 5000 * 0.7).toLocaleString();
+    document.getElementById('prizePool').textContent = prize;
+    document.getElementById('currentPrize').textContent = prize + ' د.ع';
+
+    clearAll();
+  }
+
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 3000);
+  }
+
+  buildGrid();
+</script>
+</body>
+</html>
